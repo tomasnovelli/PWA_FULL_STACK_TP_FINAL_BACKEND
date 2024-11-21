@@ -7,22 +7,22 @@ import ResponseBuilder from '../utils/responseBuilder/responseBuilder.js'
 
 const registrationController = async (req, res) =>{
     try{
-        const {userName, email, password, image} = req.body
+        const {userName, email, password, profilePicture} = req.body
         const hashedPassword = await bcrypt.hash(password, 10)
         const verificationToken = jwt.sign(
             {email: email}, 
             ENVIROMENT.JWT_SECRET, 
             {expiresIn: '1d'}
         )
-        const newUserToRegister = new User(
+        const newUserToRegister = 
             {
                 userName,
                 password: hashedPassword,
                 email,
-                image,
+                profilePicture,
                 verificationToken
             }
-        )
+        
         UserRepositoriy.saveUser(newUserToRegister)
         const response = new ResponseBuilder()
         .setOk(true)
@@ -32,8 +32,7 @@ const registrationController = async (req, res) =>{
             {
                 data: {
                     userName: newUserToRegister.userName,
-                    email: newUserToRegister.email,
-                    image: newUserToRegister.image
+                    email: newUserToRegister.email
                 }
             }
         )

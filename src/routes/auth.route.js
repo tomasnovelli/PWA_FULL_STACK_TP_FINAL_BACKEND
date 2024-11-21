@@ -1,9 +1,11 @@
 import express from 'express'
 import { registrationController } from '../controllers/auth.controller.js'
+import validators from '../middlewares/validation.middleware.js'
 
 const authRouter = express.Router()
+const {validateRegister} = validators
 
-authRouter.post('/registration', registrationController)
+authRouter.post('/registration', validateRegister, registrationController)
 /*
 authRouter.get('/verify/:verification_token', verifyMailValidationTokenController)
 authRouter.post('/login', loginController)

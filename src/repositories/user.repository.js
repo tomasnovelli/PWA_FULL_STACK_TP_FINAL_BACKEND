@@ -10,7 +10,8 @@ class UserRepositoriy {
         return existUser
     }
     static async saveUser (user){
-        return await user.save()
+        const newUser = new User(user)
+        return await newUser.save()
     }
 
     static async setEmailVerify(value, user_id){
