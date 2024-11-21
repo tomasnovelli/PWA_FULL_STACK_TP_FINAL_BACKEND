@@ -15,7 +15,7 @@ Minimum length (3).
 Maximum length(24).
 Can only contain alphanumeric characters and the following special characters: dot (.), underscore(_) and dash (-). The special characters cannot appear more than once consecutively or combined.
 
-/(?!.*[\.\-\_]{2,})^[a-zA-Z0-9\.\-\_]{3,24}$/gm
+/(?!.*[\.\-\_]{2,})^[a-zA-Z0-9\.\-\_]{3,20}$/gm
 
 ///
 
