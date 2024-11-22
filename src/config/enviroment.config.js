@@ -4,6 +4,7 @@ dotenv.config()
 
 const ENVIROMENT = {
     URL_BACK: process.env.URL_BACK,
+    URL_FRONT: process.env.URL_FRONT,
     PORT: process.env.PORT,
     DB_URL: process.env.DB_URL,
     JWT_SECRET: process.env.JWT_SECRET,

@@ -158,8 +158,54 @@ const loginController = async (req, res) => {
     }
 }
 
+const forgotPasswordController = async (req, res) => {
+    try{
+        const {email, userName} = req.user
+        console.log(email, userName)
+        const reset_token = jwt.sign({email}, ENVIROMENT.JWT_SECRET, {expiresIn: '1h'})
+        const resetUrl = `${ENVIROMENT.URL_FRONT}/reset-password/${reset_token}`
+        await sendEmail({
+            to: email,
+            subject: 'Password Reset',
+            html: `
+                <div>
+                    <h1>Password Reset</h1>
+                    <p>Hello ${userName}! you have requested to reset your password, please click the link below to reset your password</p>
+                    <a href=${resetUrl}>Click here to reset your password!</a>
+                </div>    
+            `
+        })
+        const response = new ResponseBuilder()
+        .setOk(true)
+        .setStatus(200)
+        .setMessage('Email sent')
+        .setPayload({
+            detail: 'Email sent with instructions to reset the user password'
+        })
+        .build()
+        return res.status(200).json(response)
+    }
+    catch(error){
+        console.error(error.message)
+        const response = new ResponseBuilder()
+        .setOk(false)
+        .setStatus(500)
+        .setMessage('Internal Server Error')
+        .setPayload({
+            detail: error.message
+        })
+        .build()
+        return res.status(500).json(response)
+    }
+}
+
+const resetPasswordController = async (req, res) => {
+
+}
 export {
     registrationController, 
     verifyMailValidationTokenController,
-    loginController
+    loginController,
+    forgotPasswordController,
+    resetPasswordController
 }

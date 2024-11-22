@@ -4,13 +4,12 @@ import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 import { validateEmail, validateImage, validatePassword, validateUserName } from "../utils/validation.js"
 import bcrypt from 'bcrypt'
 
-const validators = {
-    validateRegister: async (req, res, next) => {
-        try{ 
-            const {userName, email, password, profilePicture} = req.body
-            
-            if(!validateUserName(userName)){
-                const Response = new ResponseBuilder()
+export const validateRegister = async (req, res, next) => {
+    try {
+        const { userName, email, password, profilePicture } = req.body
+
+        if (!validateUserName(userName)) {
+            const Response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
                 .setMessage('Username not valid')
@@ -18,10 +17,10 @@ const validators = {
                     detail: 'Username must be 3 - 20 characters, cant be empty, numbers & special characters arent allowed'
                 })
                 .build()
-                return res.status(400).json(Response)
-            }
-            if(!validatePassword(password)){
-                const response = new ResponseBuilder()
+            return res.status(400).json(Response)
+        }
+        if (!validatePassword(password)) {
+            const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
                 .setMessage('Password not valid')
@@ -29,21 +28,21 @@ const validators = {
                     detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
                 })
                 .build()
-                return res.status(400).json(response)
-            }
-            if(!validateImage(profilePicture)){
-                const response = new ResponseBuilder() 
-                .setOk(false)    
+            return res.status(400).json(response)
+        }
+        if (!validateImage(profilePicture)) {
+            const response = new ResponseBuilder()
+                .setOk(false)
                 .setStatus(400)
                 .setMessage('Image not valid')
                 .setPayload({
                     detail: 'Image must be less than 2MB'
                 })
                 .build()
-                return res.status(400).json(response)
-            }
-            if(!validateEmail(email)){
-                const response = new ResponseBuilder()
+            return res.status(400).json(response)
+        }
+        if (!validateEmail(email)) {
+            const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
                 .setMessage('Email not valid')
@@ -51,24 +50,24 @@ const validators = {
                     detail: 'Email not valid'
                 })
                 .build()
-                return res.status(400).json(response)
-            }
-            const existUser = await User.findOne({ email: email })
-            if(existUser) {
+            return res.status(400).json(response)
+        }
+        const existUser = await User.findOne({ email: email })
+        if (existUser) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
                 .setMessage('Bad Request')
                 .setPayload({
-                        detail: 'User already exist'
+                    detail: 'User already exist'
                 })
                 .build()
-                return res.json(response)
-            }
-            return next()
+            return res.json(response)
         }
-        catch(error){
-            const response = new ResponseBuilder()
+        return next()
+    }
+    catch (error) {
+        const response = new ResponseBuilder()
             .setOk(false)
             .setStatus(500)
             .setMessage('Internal Server Error')
@@ -76,14 +75,14 @@ const validators = {
                 detail: error.message
             })
             .build()
-            return res.status(500).json(response)
-        }
-    },
-    validateLogin: async (req, res, next) => {
-        try{
-            const {email, password} = req.body
-            if(!validateEmail(email)){
-                const response = new ResponseBuilder()
+        return res.status(500).json(response)
+    }
+}
+export const validateLogin = async (req, res, next) => {
+    try {
+        const { email, password } = req.body
+        if (!validateEmail(email)) {
+            const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
                 .setMessage('Email not valid')
@@ -91,10 +90,10 @@ const validators = {
                     detail: 'You have to write a valid email, ej: pepe@gmail.com'
                 })
                 .build()
-                return res.status(400).json(response)
-            }
-            if(!validatePassword(password)){
-                const response = new ResponseBuilder()
+            return res.status(400).json(response)
+        }
+        if (!validatePassword(password)) {
+            const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
                 .setMessage('Password not valid')
@@ -102,11 +101,11 @@ const validators = {
                     detail: 'Wrong password, try again or if you forgot it, reset your password'
                 })
                 .build()
-                return res.status(400).json(response)
-            }
-            const user = await UserRepositoriy.getUserByEmail(email)
-            if(!user){
-                const response = new ResponseBuilder()
+            return res.status(400).json(response)
+        }
+        const user = await UserRepositoriy.getUserByEmail(email)
+        if (!user) {
+            const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
                 .setMessage('Not Found')
@@ -114,10 +113,10 @@ const validators = {
                     detail: 'User not found'
                 })
                 .build()
-                return res.status(400).json(response)
-            }
-            if(!user.emailVerified){
-                const response = new ResponseBuilder()
+            return res.status(400).json(response)
+        }
+        if (!user.emailVerified) {
+            const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(403)
                 .setMessage('Forbidden access')
@@ -125,11 +124,11 @@ const validators = {
                     detail: 'the email is not verified, please do it to continue'
                 })
                 .build()
-                return res.json(response)
-            }
-            const isValidPassword = await bcrypt.compare(password, user.password)
-            if(!isValidPassword){
-                const response = new ResponseBuilder()
+            return res.json(response)
+        }
+        const isValidPassword = await bcrypt.compare(password, user.password)
+        if (!isValidPassword) {
+            const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(401)
                 .setMessage('Unauthorized')
@@ -137,13 +136,13 @@ const validators = {
                     detail: 'Incorrect password'
                 })
                 .build()
-                return res.status(401).json(response)
-            }
-            req.user = user
-            return next()
+            return res.status(401).json(response)
         }
-        catch(error){    
-            const response = new ResponseBuilder()
+        req.user = user
+        return next()
+    }
+    catch (error) {
+        const response = new ResponseBuilder()
             .setOk(false)
             .setStatus(500)
             .setMessage('Internal Server Error')
@@ -151,9 +150,51 @@ const validators = {
                 detail: error.message
             })
             .build()
-            return res.status(500).json(response)
+        return res.status(500).json(response)
+    }
+}
+export const validateForgotPasswordForm = async (req, res, next) => {
+    try {
+        const { email } = req.body
+        if (!validateEmail(email)) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Email not valid')
+                .setPayload({
+                    detail: 'You have to write a valid email, ej: pepe@gmail.com'
+                })
+                .build()
+            return res.status(400).json(response)
         }
+        const user = await UserRepositoriy.getUserByEmail(email)
+        if (!user) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('Not Found')
+                .setPayload({
+                    detail: 'User not found'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        req.user = user
+        return next()
+    }
+    catch (error) {
+        console.error(error.message)
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setPayload({
+                detail: error.message
+            })
+            .build()
+        return res.status(500).json(response)
     }
 }
 
-export default validators
+
+
