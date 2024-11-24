@@ -13,11 +13,18 @@ class UserRepositoriy {
         const newUser = new User(user)
         return await newUser.save()
     }
-
-    static async setEmailVerify(value, user_id){
-        const user = await UserRepositoriy.obtenerPorEmail(user_id)
-        user.emailVerified = value
-        return await UserRepositoriy.guardarUsuario(user)
+    static async setEmailVerify(user){
+        user.emailVerified = true
+        return await user.save()
+    }
+    static async getUserContactList(user_id){
+        const user = await User.findById({_id: user_id})
+       /*  const userContactList = await user.contacts.find({emailVerified: true}) */    
+    }
+    static async addNewContact(user_id, contact_id, nickName){
+        const userToFind = await User.findById({_id: user_id})
+        userToFind.contacts.push({userId: contact_id, nickName: nickName})
+        return await userToFind.save()
     }
 }
 

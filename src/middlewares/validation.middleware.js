@@ -1,7 +1,7 @@
 import User from "../models/user.model.js"
 import UserRepositoriy from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
-import { validateEmail, validateImage, validatePassword, validateUserName } from "../utils/validation.js"
+import { validateEmail, validatePassword, validatePhoneNumber, validateUserName } from "../utils/validation.js"
 import bcrypt from 'bcrypt'
 
 export const validateRegisterFormMiddleware = async (req, res, next) => {
@@ -239,5 +239,46 @@ export const validateResetPasswordFormMiddleware  = async (req, res, next) => {
     }
 }
 
+export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
+    try{
+        const {nickName, email} = req.body
+        if(!validateUserName(nickName)){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Username not valid')
+                .setPayload({
+                    detail: 'Username must be 3 - 20 characters, cant be empty, numbers & special characters arent allowed'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        if(!validateEmail(email)){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Email not valid')
+                .setPayload({
+                    detail: 'You have to write a valid email, ej: pepe@gmail.com'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        req.contact = {nickName, email}
+        return next()
+    }
+    catch(error){
+        console.error(error.message)
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setPayload({
+                detail: error.message
+            })
+            .build()
+        return res.status(500).json(response)
+    }
+}
 
 

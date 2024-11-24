@@ -79,17 +79,6 @@ const verifyMailValidationTokenController = async (req, res) => {
         }
         const decoded = jwt.verify(verification_token, ENVIROMENT.JWT_SECRET)
         const user = await UserRepositoriy.getUserByEmail(decoded.email)
-        if(!user){
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(404)
-                .setMessage('User Not Found')
-                .setPayload({
-                    detail: 'The user isnt registred'
-                })
-                .build()
-            return res.json(response)
-        }
         if(user.emailVerified){
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -101,8 +90,7 @@ const verifyMailValidationTokenController = async (req, res) => {
                 .build()
             return res.json(response)
         }
-        user.emailVerified = true
-        await UserRepositoriy.saveUser(user)
+        await UserRepositoriy.setEmailVerify(user)
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -162,7 +150,6 @@ const loginController = async (req, res) => {
 const forgotPasswordController = async (req, res) => {
     try{
         const {email, userName} = req.user
-        console.log(email, userName)
         const reset_token = jwt.sign({email}, ENVIROMENT.JWT_SECRET, {expiresIn: '1h'})
         const resetUrl = `${ENVIROMENT.URL_FRONT}/reset-password/${reset_token}`
         await sendEmail({
