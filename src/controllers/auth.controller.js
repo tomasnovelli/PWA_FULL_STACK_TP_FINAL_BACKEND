@@ -4,6 +4,7 @@ import ENVIROMENT from '../config/enviroment.config.js'
 import UserRepositoriy from '../repositories/user.repository.js'
 import ResponseBuilder from '../utils/responseBuilder/responseBuilder.js'
 import { sendEmail } from '../utils/mail.util.js'
+import { DATA_CONTACT } from '../utils/dataMook.js'
 
 const registrationController = async (req, res) => {
     try{
@@ -32,7 +33,7 @@ const registrationController = async (req, res) => {
                 profilePicture,
                 verificationToken
             }
-        
+            
         await UserRepositoriy.saveUser(newUserToRegister)
         const response = new ResponseBuilder()
         .setOk(true)
@@ -201,7 +202,49 @@ const forgotPasswordController = async (req, res) => {
 
 const resetPasswordController = async (req, res) => {
 
+    const { password } = req.body
+    const {reset_token} = req.params
+
+    const decoded = jwt.verify(reset_token, ENVIROMENT.JWT_SECRET)
+    if(!decoded){
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(400)
+            .setMessage('Reset token not valid')
+            .setPayload({
+                detail: 'Reset token not valid'
+            })
+            .build()
+        return res.status(400).json(response)
+    }
+    const {email} = decoded
+    const user = await UserRepositoriy.getUserByEmail(email)
+    if(!user){
+        const response = new ResponseBuilder()
+        .setOk(false)
+        .setStatus(404)
+        .setMessage('User Not Found')
+        .setPayload({
+            detail: 'The user isnt registred'
+        })
+        .build()
+        return res.json(response)
+    }
+    const hashedPassword = await bcrypt.hash(password, 10)
+    user.password = hashedPassword
+    await UserRepositoriy.saveUser(user)
+    const response = new ResponseBuilder()
+        .setOk(true)
+        .setStatus(200)
+        .setMessage('Password reset')
+        .setPayload({
+            detail: 'The password has been reset succesfully'
+        })
+        .build()
+    return res.status(200).json(response)
+
 }
+
 export {
     registrationController, 
     verifyMailValidationTokenController,

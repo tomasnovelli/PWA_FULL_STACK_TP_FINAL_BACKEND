@@ -4,14 +4,17 @@ import configDB from './src/dbConfig/mongoDB.config.js';
 import statusRouter from "./src/routes/status.route.js";
 import authRouter from "./src/routes/auth.route.js";
 import cors from 'cors'
+import { verifiApiKeyMiddleware } from "./src/middlewares/auth.middleware.js";
 
 
 const app = express()
 const PORT = ENVIROMENT.PORT
 const URL_BACK = ENVIROMENT.URL_BACK
 
-app.use(express.json({limit: '5mb'}))
 app.use(cors())
+app.use(express.json({limit: '5mb'}))
+/* app.use(verifiApiKeyMiddleware) */
+
 
 app.use('/api/status', statusRouter)
 app.use('/api/auth', authRouter)

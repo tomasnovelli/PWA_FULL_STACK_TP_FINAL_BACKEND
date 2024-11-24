@@ -4,7 +4,7 @@ import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 import { validateEmail, validateImage, validatePassword, validateUserName } from "../utils/validation.js"
 import bcrypt from 'bcrypt'
 
-export const validateRegister = async (req, res, next) => {
+export const validateRegisterFormMiddleware = async (req, res, next) => {
     try {
         const { userName, email, password, profilePicture } = req.body
 
@@ -30,7 +30,7 @@ export const validateRegister = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if (!validateImage(profilePicture)) {
+        if (Buffer.byteLength(profilePicture, 'base64') > 2 * 1024 * 1024) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -67,6 +67,7 @@ export const validateRegister = async (req, res, next) => {
         return next()
     }
     catch (error) {
+        console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
             .setStatus(500)
@@ -78,7 +79,7 @@ export const validateRegister = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateLogin = async (req, res, next) => {
+export const validateLoginFormMiddleware  = async (req, res, next) => {
     try {
         const { email, password } = req.body
         if (!validateEmail(email)) {
@@ -92,17 +93,6 @@ export const validateLogin = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if (!validatePassword(password)) {
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(400)
-                .setMessage('Password not valid')
-                .setPayload({
-                    detail: 'Wrong password, try again or if you forgot it, reset your password'
-                })
-                .build()
-            return res.status(400).json(response)
-        }
         const user = await UserRepositoriy.getUserByEmail(email)
         if (!user) {
             const response = new ResponseBuilder()
@@ -111,6 +101,17 @@ export const validateLogin = async (req, res, next) => {
                 .setMessage('Not Found')
                 .setPayload({
                     detail: 'User not found'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        if (!validatePassword(password)) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Password not valid')
+                .setPayload({
+                    detail: 'Wrong password, try again or if you forgot it, reset your password'
                 })
                 .build()
             return res.status(400).json(response)
@@ -142,6 +143,7 @@ export const validateLogin = async (req, res, next) => {
         return next()
     }
     catch (error) {
+        console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
             .setStatus(500)
@@ -153,7 +155,7 @@ export const validateLogin = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateForgotPasswordForm = async (req, res, next) => {
+export const validateForgotPasswordFormMiddleware  = async (req, res, next) => {
     try {
         const { email } = req.body
         if (!validateEmail(email)) {
@@ -183,6 +185,47 @@ export const validateForgotPasswordForm = async (req, res, next) => {
         return next()
     }
     catch (error) {
+        console.error(error.message)
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setPayload({
+                detail: error.message
+            })
+            .build()
+        return res.status(500).json(response)
+    }
+}
+export const validateResetPasswordFormMiddleware  = async (req, res, next) => {
+    try{
+        const { password } = req.body
+        const { reset_token } = req.params
+        if(!reset_token){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Missing Token')
+                .setPayload({
+                    detail: 'There is no reset token on this request'
+                })
+                .build()
+            return res.json(response)
+        }
+        if (!validatePassword(password)) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Password not valid')
+                .setPayload({
+                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        return next()
+    }
+    catch(error){
         console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
