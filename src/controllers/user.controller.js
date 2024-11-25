@@ -93,7 +93,7 @@ const addNewContactController = async (req, res) => {
     }
 
 }
-const editUserProfileController = (req, res) => {
+const updateUserProfileController = (req, res) => {
 
 }
 const deleteUserAccountController = (req, res) => {
@@ -103,6 +103,6 @@ const deleteUserAccountController = (req, res) => {
 export {
     getUsercontactListController,
     addNewContactController,
-    editUserProfileController,
+    updateUserProfileController,
     deleteUserAccountController
 }

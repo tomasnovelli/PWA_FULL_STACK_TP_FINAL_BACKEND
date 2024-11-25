@@ -4,7 +4,6 @@ import ENVIROMENT from '../config/enviroment.config.js'
 import UserRepositoriy from '../repositories/user.repository.js'
 import ResponseBuilder from '../utils/responseBuilder/responseBuilder.js'
 import { sendEmail } from '../utils/mail.util.js'
-import { DATA_CONTACT } from '../utils/dataMook.js'
 
 const registrationController = async (req, res) => {
     try{
@@ -15,14 +14,14 @@ const registrationController = async (req, res) => {
             ENVIROMENT.JWT_SECRET, 
             {expiresIn: '1d'}
         )
-        const url_verification = `${ENVIROMENT.URL_BACK}${ENVIROMENT.PORT}/api/auth/verify/${verificationToken}`
+        const verificationUrl = `${ENVIROMENT.URL_FRONT}/email-verify/${verificationToken}`
         await sendEmail({
             to: email,
             subject: 'Email Verification',
             html: `
                 <h1>Verify Your Email</h1>
                 <p>Hello ${userName}! we are very happy that you have joined, before you start chatting we need to verify your account by clicking on the following link </p>
-                <a href=${url_verification}>Click here to verify!</a>
+                <a href=${verificationUrl}>Click here to verify!</a>
             `
         })
         const newUserToRegister = 
@@ -66,6 +65,7 @@ const registrationController = async (req, res) => {
 const verifyMailValidationTokenController = async (req, res) => {
     try{
         const {verification_token} = req.params
+        console.log(verification_token)
         if(!verification_token){
             const response = new ResponseBuilder()
                 .setOk(false)

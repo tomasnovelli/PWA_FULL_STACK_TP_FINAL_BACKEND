@@ -238,7 +238,6 @@ export const validateResetPasswordFormMiddleware  = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-
 export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
     try{
         const {nickName, email} = req.body
