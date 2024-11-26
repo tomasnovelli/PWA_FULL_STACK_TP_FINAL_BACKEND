@@ -245,9 +245,9 @@ export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
-                .setMessage('Username not valid')
+                .setMessage('Nickname not valid')
                 .setPayload({
-                    detail: 'Username must be 3 - 20 characters, cant be empty, numbers & special characters arent allowed'
+                    detail: 'Nickname must be 3 - 20 characters, cant be empty, numbers & special characters arent allowed'
                 })
                 .build()
             return res.status(400).json(response)

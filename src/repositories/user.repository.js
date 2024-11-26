@@ -21,8 +21,7 @@ class UserRepositoriy {
         const user = await User.findById({_id: user_id})
        /*  const userContactList = await user.contacts.find({emailVerified: true}) */    
     }
-    static async addNewContact(user_id, contact_id, nickName){
-        const userToFind = await User.findById({_id: user_id})
+    static async addNewContact(userToFind, contact_id, nickName){
         userToFind.contacts.push({userId: contact_id, nickName: nickName})
         return await userToFind.save()
     }

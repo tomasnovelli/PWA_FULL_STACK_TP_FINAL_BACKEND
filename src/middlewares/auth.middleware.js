@@ -62,7 +62,7 @@ export const verifyTokenMiddleware = (roles_permitidos = []) => {
 export const verifiApiKeyMiddleware = (req, res, next) => {
     try{
         const apiKeyHeader = req.headers['x-api-key']
-    if(!apiKeyHeader){
+        if(!apiKeyHeader){
         const response = new ResponseBuilder()
         .setOk(false)
         .setMessage('Unauthorized')

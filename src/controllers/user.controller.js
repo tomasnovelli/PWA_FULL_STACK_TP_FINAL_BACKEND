@@ -6,8 +6,6 @@ const getUsercontactListController = async (req, res) => {
         const { user_id } = req.params
         //validacion falta token
         const contactList = await UserRepositoriy.getUserContactList(user_id)
-        //validacion usuario no encontrado
-        /* console.log(contactList) */
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -35,6 +33,18 @@ const getUsercontactListController = async (req, res) => {
 const addNewContactController = async (req, res) => {
     try {
         const { user_id } = req.params
+        const existContact = await UserRepositoriy.getUserById(user_id)
+        if (!existContact) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('Not Found')
+                .setPayload({
+                    detail: 'User not found, you arent registred'
+                })
+                .build()
+            return res.status(404).json(response)
+        }
         const { nickName, email } = req.contact
         const contactToSave = await UserRepositoriy.getUserByEmail(email)
         if (!contactToSave) {
@@ -48,8 +58,8 @@ const addNewContactController = async (req, res) => {
                 .build()
             return res.status(404).json(response)
         }
-        const contact_id = contactToSave._id
-        if (contact_id == user_id) {
+        const contact_id = contactToSave._id.toString()
+        if (contact_id === user_id) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -60,7 +70,20 @@ const addNewContactController = async (req, res) => {
                 .build()
             return res.status(400).json(response)
         }
-        await UserRepositoriy.addNewContact(user_id, contact_id, nickName)
+        const userToFind = await UserRepositoriy.getUserById(user_id)
+        const existsContact = userToFind.contacts.find(contact => contact.userId.toString() === contact_id)
+        if(existsContact){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Bad Request')
+                .setPayload({
+                    detail: 'Contact already exist on your contact list'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        await UserRepositoriy.addNewContact(userToFind, contact_id, nickName)
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
