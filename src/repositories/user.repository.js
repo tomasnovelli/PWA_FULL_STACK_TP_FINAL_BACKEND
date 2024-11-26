@@ -25,6 +25,10 @@ class UserRepositoriy {
         const users = await User.find({_id: {$in: userIds}, emailVerified: true}).select('userName email profilePicture emailVerified')
         return users
     }
+    static async updateUserProfile(user_id, userUpdatedData){
+        const userToUpdate = await User.findOneAndUpdate({_id: user_id}, userUpdatedData, {new: true})
+        return userToUpdate
+    }
 }
 
 export default UserRepositoriy

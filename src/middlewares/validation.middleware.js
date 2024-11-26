@@ -280,4 +280,80 @@ export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
     }
 }
 
+export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
+    try{
+        const {user_id} = req.params
+        const {userName, actualPassword, password, profilePicture} = req.body
+        if(!user_id){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Missing User Id')
+                .setPayload({
+                    detail: 'There is no user id on this request'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        if(!validateUserName(userName)){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Username not valid')
+                .setPayload({
+                    detail: 'Username must be 3 - 20 characters, cant be empty, numbers & special characters arent allowed'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        if(!validatePassword(actualPassword)){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Actual Password not valid')
+                .setPayload({
+                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        if(!validatePassword(password)){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Password not valid')
+                .setPayload({
+                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        if(Buffer.byteLength(profilePicture, 'base64') > 2 * 1024 * 1024){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Profile Picture not valid')
+                .setPayload({
+                    detail: 'Profile Picture must be less than 2MB'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        req.user = {userName, actualPassword, password, profilePicture, user_id}
+        return next()
+    }    
+    catch(error){
+        console.error(error.message)
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setPayload({
+                detail: error.message
+            })
+            .build()
+        return res.status(500).json(response)
+    }
+}
+
 
