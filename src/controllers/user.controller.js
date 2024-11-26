@@ -1,17 +1,41 @@
+import User from "../models/user.model.js"
 import UserRepositoriy from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 
 const getUsercontactListController = async (req, res) => {
     try {
         const { user_id } = req.params
-        //validacion falta token
-        const contactList = await UserRepositoriy.getUserContactList(user_id)
+        const user = await UserRepositoriy.getUserById(user_id)
+        if(!user){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('Not Found')
+                .setPayload({
+                    detail: 'User not found'
+                })
+                .build()
+            return res.status(404).json(response)
+            }
+        const contacts = user.contacts
+        const userIds = contacts.map(contact => contact.userId)
+        const users = await UserRepositoriy.getUsersAddedToContactListById(userIds)
+        const contactList = contacts.map(contact => {
+            const user = users.find(user => user._id.toString() === contact.userId.toString())
+            return {
+                contactId: contact.userId.toString(),
+                nickName: contact.nickName,
+                userName: user?.userName,
+                email: user?.email,
+                profilePicture: user?.profilePicture
+            }
+        })
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
             .setMessage('Contact List obtained')
             .setPayload({
-                contactList: contactList
+                contacts: contactList
             })
             .build()
         return res.status(200).json(response)
@@ -47,7 +71,18 @@ const addNewContactController = async (req, res) => {
         }
         const { nickName, email } = req.contact
         const contactToSave = await UserRepositoriy.getUserByEmail(email)
-        if (!contactToSave) {
+        if(!contactToSave){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('Not Found')
+                .setPayload({
+                    detail: 'Contact not found'
+                })
+                .build()
+            return res.status(404).json(response)
+        }
+        if (contactToSave.emailVerified === false) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)

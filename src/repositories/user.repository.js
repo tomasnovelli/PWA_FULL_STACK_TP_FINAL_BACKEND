@@ -17,13 +17,13 @@ class UserRepositoriy {
         user.emailVerified = true
         return await user.save()
     }
-    static async getUserContactList(user_id){
-        const user = await User.findById({_id: user_id})
-       /*  const userContactList = await user.contacts.find({emailVerified: true}) */    
-    }
     static async addNewContact(userToFind, contact_id, nickName){
         userToFind.contacts.push({userId: contact_id, nickName: nickName})
         return await userToFind.save()
+    }
+    static async getUsersAddedToContactListById(userIds){
+        const users = await User.find({_id: {$in: userIds}, emailVerified: true}).select('userName email profilePicture emailVerified')
+        return users
     }
 }
 
