@@ -153,7 +153,6 @@ const addNewContactController = async (req, res) => {
 const updateUserProfileController = async (req, res) => {
     try{
         const { userName, profilePicture, user_id, hashedPassword } = req.user
-        
         const userUpdatedData = {
             userName,
             password: hashedPassword,

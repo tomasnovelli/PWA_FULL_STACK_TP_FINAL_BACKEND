@@ -7,7 +7,7 @@ const sendEmail = async (options) => {
         console.log('email sended')
     }
     catch(error){
-        console.erro('error al enviar mail:', error)
+        console.error('error al enviar mail:', error)
         throw error
     }
 }
