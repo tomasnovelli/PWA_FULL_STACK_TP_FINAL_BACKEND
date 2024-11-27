@@ -152,26 +152,14 @@ const addNewContactController = async (req, res) => {
 }
 const updateUserProfileController = async (req, res) => {
     try{
-        const { userName, actualPassword, password, profilePicture, user_id } = req.user
-        const user = await UserRepositoriy.getUserById(user_id)
-        const isValidPassword = await bcrypt.compare(actualPassword, user.password)
-        if(!isValidPassword){
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(400)
-                .setMessage('Bad Request')
-                .setPayload({
-                    detail: 'Password doesnt match with your actual password, try again'
-                })
-                .build()
-            return res.status(400).json(response)
-        }
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const { userName, profilePicture, user_id, hashedPassword } = req.user
+        
         const userUpdatedData = {
             userName,
             password: hashedPassword,
             profilePicture
         }
+        console.log(user_id)
         const userToUpdate = await UserRepositoriy.updateUserProfile(user_id, userUpdatedData)
         if(!userToUpdate){
             const response = new ResponseBuilder()
@@ -191,8 +179,10 @@ const updateUserProfileController = async (req, res) => {
             .setPayload({
                 message:'Profile Updated',
                 detail: {
-                    userName: userToUpdate.userName,
-                    profilePicture: userToUpdate.profilePicture
+                        id: userToUpdate._id,
+                        userName: userToUpdate.userName,
+                        email: userToUpdate.email,
+                        profilePicture: userToUpdate.profilePicture
                 }
             })
             .build()

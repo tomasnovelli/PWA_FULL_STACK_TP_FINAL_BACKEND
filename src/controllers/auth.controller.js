@@ -116,7 +116,7 @@ const verifyMailValidationTokenController = async (req, res) => {
 }
 const loginController = async (req, res) => {
     try{
-        const {userName, email, _id} = req.user
+        const {userName, email, _id, profilePicture} = req.user
         const token = jwt.sign({email, _id}, ENVIROMENT.JWT_SECRET, {expiresIn: '1d'})
         const response = new ResponseBuilder()
         .setOk(true)
@@ -127,7 +127,8 @@ const loginController = async (req, res) => {
             user: {
                 id: _id,
                 userName,
-                email
+                email,
+                profilePicture
             }
         })
         .build()

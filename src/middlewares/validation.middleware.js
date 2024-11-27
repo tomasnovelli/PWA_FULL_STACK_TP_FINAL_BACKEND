@@ -79,7 +79,7 @@ export const validateRegisterFormMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateLoginFormMiddleware  = async (req, res, next) => {
+export const validateLoginFormMiddleware = async (req, res, next) => {
     try {
         const { email, password } = req.body
         if (!validateEmail(email)) {
@@ -155,7 +155,7 @@ export const validateLoginFormMiddleware  = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateForgotPasswordFormMiddleware  = async (req, res, next) => {
+export const validateForgotPasswordFormMiddleware = async (req, res, next) => {
     try {
         const { email } = req.body
         if (!validateEmail(email)) {
@@ -197,11 +197,11 @@ export const validateForgotPasswordFormMiddleware  = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateResetPasswordFormMiddleware  = async (req, res, next) => {
-    try{
+export const validateResetPasswordFormMiddleware = async (req, res, next) => {
+    try {
         const { password } = req.body
         const { reset_token } = req.params
-        if(!reset_token){
+        if (!reset_token) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -225,7 +225,7 @@ export const validateResetPasswordFormMiddleware  = async (req, res, next) => {
         }
         return next()
     }
-    catch(error){
+    catch (error) {
         console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
@@ -238,10 +238,10 @@ export const validateResetPasswordFormMiddleware  = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
-    try{
-        const {nickName, email} = req.body
-        if(!validateUserName(nickName)){
+export const validateAddNewContactFormMiddleware = async (req, res, next) => {
+    try {
+        const { nickName, email } = req.body
+        if (!validateUserName(nickName)) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -252,7 +252,7 @@ export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if(!validateEmail(email)){
+        if (!validateEmail(email)) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -263,10 +263,10 @@ export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        req.contact = {nickName, email}
+        req.contact = { nickName, email }
         return next()
     }
-    catch(error){
+    catch (error) {
         console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
@@ -281,10 +281,10 @@ export const validateAddNewContactFormMiddleware  = async (req, res, next) => {
 }
 
 export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
-    try{
-        const {user_id} = req.params
-        const {userName, actualPassword, password, profilePicture} = req.body
-        if(!user_id){
+    try {
+        const { user_id } = req.params
+        const { userName, actualPassword, password, profilePicture } = req.body
+        if (!user_id) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -295,7 +295,7 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if(!validateUserName(userName)){
+        if (!validateUserName(userName)) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -306,29 +306,7 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if(!validatePassword(actualPassword)){
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(400)
-                .setMessage('Actual Password not valid')
-                .setPayload({
-                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
-                })
-                .build()
-            return res.status(400).json(response)
-        }
-        if(!validatePassword(password)){
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(400)
-                .setMessage('Password not valid')
-                .setPayload({
-                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
-                })
-                .build()
-            return res.status(400).json(response)
-        }
-        if(Buffer.byteLength(profilePicture, 'base64') > 2 * 1024 * 1024){
+        if (Buffer.byteLength(profilePicture, 'base64') > 2 * 1024 * 1024) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -339,10 +317,51 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        req.user = {userName, actualPassword, password, profilePicture, user_id}
-        return next()
-    }    
-    catch(error){
+        if (actualPassword === '' && password === '') {
+            req.user = { userName, profilePicture, user_id }
+            return next()
+        }
+        else if (!validatePassword(actualPassword)) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Actual Password not valid')
+                .setPayload({
+                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        else if (!validatePassword(password)) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Password not valid')
+                .setPayload({
+                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                })
+                .build()
+            return res.status(400).json(response)
+        } else {
+            const user = await UserRepositoriy.getUserById(user_id)
+            const isValidPassword = await bcrypt.compare(actualPassword, user.password)
+            if (!isValidPassword) {
+                const response = new ResponseBuilder()
+                    .setOk(false)
+                    .setStatus(400)
+                    .setMessage('Bad Request')
+                    .setPayload({
+                        detail: 'Password doesnt match with your actual password, try again'
+                    })
+                    .build()
+                return res.status(400).json(response)
+            }
+            const hashedPassword = await bcrypt.hash(password, 10)
+            req.user = { userName, hashedPassword, profilePicture, user_id }
+            return next()
+        }
+    }
+    catch (error) {
         console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
