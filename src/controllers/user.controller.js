@@ -1,6 +1,6 @@
 import UserRepositoriy from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
-import bcrypt, { hash } from 'bcrypt'
+
 const getUsercontactListController = async (req, res) => {
     try {
         const { user_id } = req.params
@@ -159,7 +159,6 @@ const updateUserProfileController = async (req, res) => {
             password: hashedPassword,
             profilePicture
         }
-        console.log(user_id)
         const userToUpdate = await UserRepositoriy.updateUserProfile(user_id, userUpdatedData)
         if(!userToUpdate){
             const response = new ResponseBuilder()

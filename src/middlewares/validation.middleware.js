@@ -317,7 +317,7 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if (actualPassword === '' && password === '') {
+        if (actualPassword.trim() === '' && password.trim() === '') {
             req.user = { userName, profilePicture, user_id }
             return next()
         }
