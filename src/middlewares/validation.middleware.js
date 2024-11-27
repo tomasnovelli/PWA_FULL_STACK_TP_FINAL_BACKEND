@@ -1,7 +1,7 @@
 import User from "../models/user.model.js"
 import UserRepositoriy from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
-import { validateEmail, validatePassword, validatePhoneNumber, validateUserName } from "../utils/validation.js"
+import { validateEmail, validatePassword, validateUserName } from "../utils/validation.js"
 import bcrypt from 'bcrypt'
 
 export const validateRegisterFormMiddleware = async (req, res, next) => {
