@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import ENVIROMENT from '../config/enviroment.config.js'
-import UserRepositoriy from '../repositories/user.repository.js'
+import userRepository from '../repositories/user.repository.js'
 import ResponseBuilder from '../utils/responseBuilder/responseBuilder.js'
 import { sendEmail } from '../utils/mail.util.js'
 
@@ -33,7 +33,7 @@ const registrationController = async (req, res) => {
                 verificationToken
             }
             
-        await UserRepositoriy.saveUser(newUserToRegister)
+        await userRepository.saveUser(newUserToRegister)
         const response = new ResponseBuilder()
         .setOk(true)
         .setStatus(200)
@@ -78,7 +78,7 @@ const verifyMailValidationTokenController = async (req, res) => {
             return res.json(response)
         }
         const decoded = jwt.verify(verification_token, ENVIROMENT.JWT_SECRET)
-        const user = await UserRepositoriy.getUserByEmail(decoded.email)
+        const user = await userRepository.getUserByEmail(decoded.email)
         if(user.emailVerified){
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -90,7 +90,7 @@ const verifyMailValidationTokenController = async (req, res) => {
                 .build()
             return res.json(response)
         }
-        await UserRepositoriy.setEmailVerify(user)
+        await userRepository.setEmailVerify(user)
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -206,7 +206,7 @@ const resetPasswordController = async (req, res) => {
         return res.status(400).json(response)
     }
     const {email} = decoded
-    const user = await UserRepositoriy.getUserByEmail(email)
+    const user = await userRepository.getUserByEmail(email)
     if(!user){
         const response = new ResponseBuilder()
         .setOk(false)
@@ -220,7 +220,7 @@ const resetPasswordController = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10)
     user.password = hashedPassword
-    await UserRepositoriy.saveUser(user)
+    await userRepository.saveUser(user)
     const response = new ResponseBuilder()
         .setOk(true)
         .setStatus(200)

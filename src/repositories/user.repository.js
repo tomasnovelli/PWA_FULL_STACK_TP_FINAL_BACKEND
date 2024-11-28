@@ -1,6 +1,6 @@
 import User from "../models/user.model.js"
 import mongoose from "mongoose"
-class UserRepositoriy {
+class UserRepository {
     static async getUserById(id){
         const existUser = await User.findOne({_id: id})
         return existUser
@@ -29,6 +29,10 @@ class UserRepositoriy {
         const userToUpdate = await User.findOneAndUpdate({_id: user_id}, userUpdatedData, {new: true})
         return userToUpdate
     }
+    static async deleteUserById(user_id){
+        const userToDelete = await User.findByIdAndDelete({_id: user_id})
+        return userToDelete
+    }
 }
 
-export default UserRepositoriy
+export default UserRepository

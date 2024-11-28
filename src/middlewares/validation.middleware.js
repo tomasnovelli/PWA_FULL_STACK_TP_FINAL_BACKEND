@@ -1,5 +1,5 @@
 import User from "../models/user.model.js"
-import UserRepositoriy from "../repositories/user.repository.js"
+import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 import { validateEmail, validatePassword, validateUserName } from "../utils/validation.js"
 import bcrypt from 'bcrypt'
@@ -93,7 +93,7 @@ export const validateLoginFormMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        const user = await UserRepositoriy.getUserByEmail(email)
+        const user = await userRepository.getUserByEmail(email)
         if (!user) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -169,7 +169,7 @@ export const validateForgotPasswordFormMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        const user = await UserRepositoriy.getUserByEmail(email)
+        const user = await userRepository.getUserByEmail(email)
         if (!user) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -343,7 +343,7 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         } else {
-            const user = await UserRepositoriy.getUserById(user_id)
+            const user = await userRepository.getUserById(user_id)
             const isValidPassword = await bcrypt.compare(actualPassword, user.password)
             if (!isValidPassword) {
                 const response = new ResponseBuilder()

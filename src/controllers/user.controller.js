@@ -1,11 +1,12 @@
-import UserRepositoriy from "../repositories/user.repository.js"
+import User from "../models/user.model.js"
+import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 
 const getUsercontactListController = async (req, res) => {
     try {
         const { user_id } = req.params
-        const user = await UserRepositoriy.getUserById(user_id)
-        if(!user){
+        const user = await userRepository.getUserById(user_id)
+        if (!user) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
@@ -15,10 +16,10 @@ const getUsercontactListController = async (req, res) => {
                 })
                 .build()
             return res.status(404).json(response)
-            }
+        }
         const contacts = user.contacts
         const userIds = contacts.map(contact => contact.userId)
-        const users = await UserRepositoriy.getUsersAddedToContactListById(userIds)
+        const users = await userRepository.getUsersAddedToContactListById(userIds)
         const contactList = contacts.map(contact => {
             const user = users.find(user => user._id.toString() === contact.userId.toString())
             return {
@@ -56,7 +57,7 @@ const getUsercontactListController = async (req, res) => {
 const addNewContactController = async (req, res) => {
     try {
         const { user_id } = req.params
-        const existContact = await UserRepositoriy.getUserById(user_id)
+        const existContact = await userRepository.getUserById(user_id)
         if (!existContact) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -69,8 +70,8 @@ const addNewContactController = async (req, res) => {
             return res.status(404).json(response)
         }
         const { nickName, email } = req.contact
-        const contactToSave = await UserRepositoriy.getUserByEmail(email)
-        if(!contactToSave){
+        const contactToSave = await userRepository.getUserByEmail(email)
+        if (!contactToSave) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
@@ -104,9 +105,9 @@ const addNewContactController = async (req, res) => {
                 .build()
             return res.status(400).json(response)
         }
-        const userToFind = await UserRepositoriy.getUserById(user_id)
+        const userToFind = await userRepository.getUserById(user_id)
         const existsContact = userToFind.contacts.find(contact => contact.userId.toString() === contact_id)
-        if(existsContact){
+        if (existsContact) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -117,7 +118,7 @@ const addNewContactController = async (req, res) => {
                 .build()
             return res.status(400).json(response)
         }
-        await UserRepositoriy.addNewContact(userToFind, contact_id, nickName)
+        await userRepository.addNewContact(userToFind, contact_id, nickName)
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -151,15 +152,15 @@ const addNewContactController = async (req, res) => {
 
 }
 const updateUserProfileController = async (req, res) => {
-    try{
+    try {
         const { userName, profilePicture, user_id, hashedPassword } = req.user
         const userUpdatedData = {
             userName,
             password: hashedPassword,
             profilePicture
         }
-        const userToUpdate = await UserRepositoriy.updateUserProfile(user_id, userUpdatedData)
-        if(!userToUpdate){
+        const userToUpdate = await userRepository.updateUserProfile(user_id, userUpdatedData)
+        if (!userToUpdate) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
@@ -175,18 +176,18 @@ const updateUserProfileController = async (req, res) => {
             .setStatus(200)
             .setMessage('Profile Updated')
             .setPayload({
-                message:'Profile Updated',
+                message: 'Profile Updated',
                 detail: {
-                        id: userToUpdate._id,
-                        userName: userToUpdate.userName,
-                        email: userToUpdate.email,
-                        profilePicture: userToUpdate.profilePicture
+                    id: userToUpdate._id,
+                    userName: userToUpdate.userName,
+                    email: userToUpdate.email,
+                    profilePicture: userToUpdate.profilePicture
                 }
             })
             .build()
         return res.status(200).json(response)
     }
-    catch(error){
+    catch (error) {
         console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
@@ -199,8 +200,58 @@ const updateUserProfileController = async (req, res) => {
         return res.status(500).json(response)
     }
 }
-const deleteUserAccountController = (req, res) => {
+const deleteUserAccountController = async (req, res) => {
+    try {
+        const { user_id } = req.params
+        const deletedUser = await userRepository.deleteUserById(user_id)
+        if (!deletedUser) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('Not Found')
+                .setPayload({
+                    detail: 'User not found'
+                })
+                .build()
+            return res.status(404).json(response)
+        }
+        const updateDeteledUser = await User.updateMany(
+            { contacts: deletedUser._id },
+            { $pull: { contacts: deletedUser._id } }
+        )
+        if(!updateDeteledUser) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('Not Found')
+                .setPayload({
+                    detail: 'User not found'
+                })
+                .build()
+            return res.status(404).json(response)
+        }
+        const response = new ResponseBuilder()
+            .setOk(true)
+            .setStatus(200)
+            .setMessage('User deleted')
+            .setPayload({
+                detail: 'User deleted'
+            })
+            .build()
+        return res.status(200).json(response)
+    }
 
+    catch (error) {
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setPayload({
+                detail: error.message
+            })
+            .build()
+        return res.status(500).json(response)
+    }
 }
 
 export {
