@@ -1,5 +1,6 @@
 import User from "../models/user.model.js"
 import mongoose from "mongoose"
+
 class UserRepository {
     static async getUserById(id){
         const existUser = await User.findOne({_id: id})

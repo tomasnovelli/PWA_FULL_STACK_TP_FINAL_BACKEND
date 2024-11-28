@@ -2,6 +2,50 @@ import User from "../models/user.model.js"
 import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 
+export const getCurrentUserProfileDataController = async (req, res) => {
+    try{
+        const { user_id } = req.params
+        console.log(user_id)
+        const user = await userRepository.getUserById(user_id)
+        if (!user) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('Not Found')
+                .setPayload({
+                    detail: 'User not found'
+                })
+                .build()
+            return res.status(404).json(response)
+        }
+        const response = new ResponseBuilder()
+            .setOk(true)
+            .setStatus(200)
+            .setMessage('User obtained')
+            .setPayload({
+                user:{
+                    id: user._id,
+                    userName: user.userName,
+                    email: user.email,
+                    profilePicture: user.profilePicture
+                }
+            })
+            .build()
+        return res.status(200).json(response)
+    }
+    catch (error) {
+        console.error(error.message)
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setPayload({
+                detail: error.message
+            })
+            .build()
+        return res.status(500).json(response)
+    }
+}
 const getUsercontactListController = async (req, res) => {
     try {
         const { user_id } = req.params

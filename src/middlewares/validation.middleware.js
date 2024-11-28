@@ -279,7 +279,6 @@ export const validateAddNewContactFormMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-
 export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
     try {
         const { user_id } = req.params

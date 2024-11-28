@@ -147,7 +147,6 @@ const loginController = async (req, res) => {
         return res.status(500).json(response)
     }
 }
-
 const forgotPasswordController = async (req, res) => {
     try{
         const {email, userName} = req.user
@@ -187,7 +186,6 @@ const forgotPasswordController = async (req, res) => {
         return res.status(500).json(response)
     }
 }
-
 const resetPasswordController = async (req, res) => {
 
     const { password } = req.body

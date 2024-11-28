@@ -16,7 +16,6 @@ app.use(cors())
 app.use(express.json({limit: '5mb'}))
 app.use(verifiApiKeyMiddleware)
 
-
 app.use('/api/status', statusRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)

@@ -1,6 +1,5 @@
 import transporter from "../config/transporter.config.js"
 
-
 const sendEmail = async (options) => {
     try{
         await transporter.sendMail(options)
