@@ -65,7 +65,6 @@ const registrationController = async (req, res) => {
 const verifyMailValidationTokenController = async (req, res) => {
     try{
         const {verification_token} = req.params
-        console.log(verification_token)
         if(!verification_token){
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -79,6 +78,17 @@ const verifyMailValidationTokenController = async (req, res) => {
         }
         const decoded = jwt.verify(verification_token, ENVIROMENT.JWT_SECRET)
         const user = await userRepository.getUserByEmail(decoded.email)
+        if(!user){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('User Not Found')
+                .setPayload({
+                    detail: 'You are not registred'
+                })
+                .build()
+            return res.json(response)
+        }
         if(user.emailVerified){
             const response = new ResponseBuilder()
                 .setOk(false)
