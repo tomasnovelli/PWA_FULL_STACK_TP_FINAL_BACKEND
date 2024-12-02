@@ -19,13 +19,24 @@ export const validateRegisterFormMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(Response)
         }
+        if (!validateEmail(email)) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Email not valid')
+                .setPayload({
+                    detail: 'Email not valid'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
         if (!validatePassword(password)) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
                 .setMessage('Password not valid')
                 .setPayload({
-                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                    detail: 'Password must be 8 to 15 character, at least 1 uppercase letter, 1 lowercase letter, and 1 number'
                 })
                 .build()
             return res.status(400).json(response)
@@ -41,17 +52,7 @@ export const validateRegisterFormMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if (!validateEmail(email)) {
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(400)
-                .setMessage('Email not valid')
-                .setPayload({
-                    detail: 'Email not valid'
-                })
-                .build()
-            return res.status(400).json(response)
-        }
+
         const existUser = await User.findOne({ email: email })
         if (existUser) {
             const response = new ResponseBuilder()
@@ -98,7 +99,7 @@ export const validateLoginFormMiddleware = async (req, res, next) => {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
-                .setMessage('Not Found')
+                .setMessage('User Not Found')
                 .setPayload({
                     detail: 'User not found'
                 })
@@ -120,7 +121,7 @@ export const validateLoginFormMiddleware = async (req, res, next) => {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(403)
-                .setMessage('Forbidden access')
+                .setMessage('Account Not Verified')
                 .setPayload({
                     detail: 'the email is not verified, please do it to continue'
                 })
@@ -132,7 +133,7 @@ export const validateLoginFormMiddleware = async (req, res, next) => {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(401)
-                .setMessage('Unauthorized')
+                .setMessage('Incorrect Password')
                 .setPayload({
                     detail: 'Incorrect password'
                 })
@@ -218,7 +219,7 @@ export const validateResetPasswordFormMiddleware = async (req, res, next) => {
                 .setStatus(400)
                 .setMessage('Password not valid')
                 .setPayload({
-                    detail: 'Password must be at least 8 characters and must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number'
+                    detail: 'Password must be 8 to 15 character, at least 1 uppercase letter, 1 lowercase letter, and 1 number'
                 })
                 .build()
             return res.status(400).json(response)

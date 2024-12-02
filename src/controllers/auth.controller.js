@@ -117,7 +117,7 @@ const verifyMailValidationTokenController = async (req, res) => {
 const loginController = async (req, res) => {
     try{
         const {userName, email, _id, profilePicture} = req.user
-        const token = jwt.sign({email, _id}, ENVIROMENT.JWT_SECRET, {expiresIn: '1d'})
+        const token = jwt.sign({email, _id}, ENVIROMENT.JWT_SECRET, {expiresIn: '5h'})
         const response = new ResponseBuilder()
         .setOk(true)
         .setStatus(200)
@@ -222,7 +222,7 @@ const resetPasswordController = async (req, res) => {
     const response = new ResponseBuilder()
         .setOk(true)
         .setStatus(200)
-        .setMessage('Password reset')
+        .setMessage('Password reset succesfully')
         .setPayload({
             detail: 'The password has been reset succesfully'
         })

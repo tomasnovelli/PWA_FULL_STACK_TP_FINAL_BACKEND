@@ -2,10 +2,9 @@ import User from "../models/user.model.js"
 import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 
-export const getCurrentUserProfileDataController = async (req, res) => {
+const getCurrentUserProfileDataController = async (req, res) => {
     try{
         const { user_id } = req.params
-        console.log(user_id)
         const user = await userRepository.getUserById(user_id)
         if (!user) {
             const response = new ResponseBuilder()
@@ -302,5 +301,6 @@ export {
     getUsercontactListController,
     addNewContactController,
     updateUserProfileController,
-    deleteUserAccountController
+    deleteUserAccountController,
+    getCurrentUserProfileDataController
 }
