@@ -10,6 +10,6 @@ userRouter.get('/profile/:user_id', getCurrentUserProfileDataController)
 userRouter.get('/contacts/:user_id', getUsercontactListController)
 userRouter.post('/contacts/:user_id/add-new-contact',validateAddNewContactFormMiddleware, addNewContactController)
 userRouter.put('/update-profile/:user_id', validateUpdateUserProfileMiddleware, updateUserProfileController)
-userRouter.delete('/delete-user-account/:user_id', deleteUserAccountController)
+userRouter.put('/delete-user-account/:user_id', deleteUserAccountController)
 
 export default userRouter

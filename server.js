@@ -6,6 +6,8 @@ import authRouter from "./src/routes/auth.route.js";
 import cors from 'cors'
 import { verifiApiKeyMiddleware } from "./src/middlewares/auth.middleware.js";
 import userRouter from "./src/routes/user.route.js";
+import contactRouter from "./src/routes/contact.route.js";
+import messagesRouter from "./src/routes/message.route.js";
 
 
 const app = express()
@@ -19,6 +21,8 @@ app.use(verifiApiKeyMiddleware)
 app.use('/api/status', statusRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
+app.use('/api/contact', contactRouter)
+app.use('/api/messages', messagesRouter)
 
 app.listen(PORT, ()=>{
     console.log(`Server Listened at port ${URL_BACK}${PORT}`)

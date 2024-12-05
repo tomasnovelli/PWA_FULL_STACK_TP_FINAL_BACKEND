@@ -63,6 +63,7 @@ const getUsercontactListController = async (req, res) => {
         const contacts = user.contacts
         const userIds = contacts.map(contact => contact.userId)
         const users = await userRepository.getUsersAddedToContactListById(userIds)
+
         const contactList = contacts.map(contact => {
             const user = users.find(user => user._id.toString() === contact.userId.toString())
             return {
@@ -73,6 +74,7 @@ const getUsercontactListController = async (req, res) => {
                 profilePicture: user?.profilePicture
             }
         })
+        
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -100,32 +102,10 @@ const getUsercontactListController = async (req, res) => {
 const addNewContactController = async (req, res) => {
     try {
         const { user_id } = req.params
-        const existContact = await userRepository.getUserById(user_id)
-        if (!existContact) {
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(404)
-                .setMessage('Not Found')
-                .setPayload({
-                    detail: 'User not found, you arent registred'
-                })
-                .build()
-            return res.status(404).json(response)
-        }
         const { nickName, email } = req.contact
+
         const contactToSave = await userRepository.getUserByEmail(email)
-        if (!contactToSave) {
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(404)
-                .setMessage('Not Found')
-                .setPayload({
-                    detail: 'Contact not found'
-                })
-                .build()
-            return res.status(404).json(response)
-        }
-        if (contactToSave.emailVerified === false) {
+        if (!contactToSave || !contactToSave.active || !contactToSave.emailVerified) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
@@ -161,7 +141,7 @@ const addNewContactController = async (req, res) => {
                 .build()
             return res.status(400).json(response)
         }
-        await userRepository.addNewContact(userToFind, contact_id, nickName)
+        await userRepository.addNewContact(userToFind, contact_id, nickName, contactToSave.active)
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -258,21 +238,7 @@ const deleteUserAccountController = async (req, res) => {
                 .build()
             return res.status(404).json(response)
         }
-        const updateDeteledUser = await User.updateMany(
-            { contacts: deletedUser._id },
-            { $pull: { contacts: deletedUser._id } }
-        )
-        if(!updateDeteledUser) {
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(404)
-                .setMessage('Not Found')
-                .setPayload({
-                    detail: 'User not found'
-                })
-                .build()
-            return res.status(404).json(response)
-        }
+        const user = await userRepository.getUserById(user_id)
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)

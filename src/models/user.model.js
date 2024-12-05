@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    profilePicture:{
+    profilePicture: {
         type: String
     },
     emailVerified: {
@@ -25,13 +25,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    active: {
+        type: Boolean,
+        default: true
+    },
     registeredAt: {
         type: Date,
         default: Date.now
     },
     contacts: [
         {
-            userId:{
+            userId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User'
             },

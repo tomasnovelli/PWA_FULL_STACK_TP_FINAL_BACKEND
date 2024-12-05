@@ -52,8 +52,8 @@ export const validateRegisterFormMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-
-        const existUser = await User.findOne({ email: email })
+        req.user = { userName, email, password, profilePicture }
+/*         const existUser = await User.findOne({ email: email })
         if (existUser) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -64,7 +64,7 @@ export const validateRegisterFormMiddleware = async (req, res, next) => {
                 })
                 .build()
             return res.json(response)
-        }
+        } */
         return next()
     }
     catch (error) {
@@ -89,30 +89,19 @@ export const validateLoginFormMiddleware = async (req, res, next) => {
                 .setStatus(400)
                 .setMessage('Email not valid')
                 .setPayload({
-                    detail: 'You have to write a valid email, ej: pepe@gmail.com'
+                    detail: 'Email not valid'
                 })
                 .build()
             return res.status(400).json(response)
         }
         const user = await userRepository.getUserByEmail(email)
-        if (!user) {
+        if (!user || !user.active) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
                 .setMessage('User Not Found')
                 .setPayload({
                     detail: 'User not found'
-                })
-                .build()
-            return res.status(400).json(response)
-        }
-        if (!validatePassword(password)) {
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(400)
-                .setMessage('Password not valid')
-                .setPayload({
-                    detail: 'Wrong password, try again or if you forgot it, reset your password'
                 })
                 .build()
             return res.status(400).json(response)
@@ -165,13 +154,13 @@ export const validateForgotPasswordFormMiddleware = async (req, res, next) => {
                 .setStatus(400)
                 .setMessage('Email not valid')
                 .setPayload({
-                    detail: 'You have to write a valid email, ej: pepe@gmail.com'
+                    detail: 'Email not valid'
                 })
                 .build()
             return res.status(400).json(response)
         }
         const user = await userRepository.getUserByEmail(email)
-        if (!user) {
+        if (!user || !user.active) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(404)
@@ -259,7 +248,7 @@ export const validateAddNewContactFormMiddleware = async (req, res, next) => {
                 .setStatus(400)
                 .setMessage('Email not valid')
                 .setPayload({
-                    detail: 'You have to write a valid email, ej: pepe@gmail.com'
+                    detail: 'Email not valid'
                 })
                 .build()
             return res.status(400).json(response)

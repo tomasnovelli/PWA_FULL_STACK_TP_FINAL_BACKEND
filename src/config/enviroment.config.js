@@ -12,6 +12,5 @@ const ENVIROMENT = {
     GMAIL_EMAIL: process.env.GMAIL_EMAIL,
     API_KEY_INTERN: process.env.API_KEY_INTERN
 }
-console.log( ENVIROMENT )
 
 export default ENVIROMENT

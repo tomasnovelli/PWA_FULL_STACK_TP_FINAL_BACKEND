@@ -12,18 +12,18 @@ class UserRepository {
     }
     static async saveUser (user){
         const newUser = new User(user)
-        return await newUser.save()
+        return newUser.save()
     }
     static async setEmailVerify(user){
         user.emailVerified = true
-        return await user.save()
+        return user.save()
     }
-    static async addNewContact(userToFind, contact_id, nickName){
-        userToFind.contacts.push({userId: contact_id, nickName: nickName})
-        return await userToFind.save()
+    static async addNewContact(userToFind, contact_id, nickName, contactState){
+        userToFind.contacts.push({userId: contact_id, nickName: nickName, active: contactState})
+        return userToFind.save()
     }
     static async getUsersAddedToContactListById(userIds){
-        const users = await User.find({_id: {$in: userIds}, emailVerified: true}).select('userName email profilePicture emailVerified')
+        const users = await User.find({_id: {$in: userIds}, emailVerified: true, active: true}).select('userName email profilePicture emailVerified')
         return users
     }
     static async updateUserProfile(user_id, userUpdatedData){
@@ -31,9 +31,29 @@ class UserRepository {
         return userToUpdate
     }
     static async deleteUserById(user_id){
-        const userToDelete = await User.findByIdAndDelete({_id: user_id})
+        const userToDelete = await User.findByIdAndUpdate({_id: user_id}, {active: false, emailVerified: false}, {new: true})
+        await User.updateMany(
+            {},
+            {$pull: {contacts: {userId: user_id}}}
+        )
         return userToDelete
     }
+    static updateContactStatus = async (deletedUserId) => {
+            const result = await User.updateMany(
+                {'contacts.userId': deletedUserId},
+                {$set: {'contacts.$.active': false}},
+                {arrayFilters: [{'element.userId': deletedUserId}]}
+            )
+            return result
+    }
+    static deleteContactFromContactListById = async (user_id, contact_id) => {
+        const result = await User.updateOne(
+            {_id: user_id},
+            {$pull: {contacts: {userId: contact_id}}}
+        )
+        return result
+    }
+    
 }
 
 export default UserRepository
