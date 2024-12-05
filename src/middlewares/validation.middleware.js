@@ -368,7 +368,7 @@ export const validateMessageMiddleware = async (req, res, next) => {
     try{
         const {contact_id} = req.params
         const { content } = req.body
-
+        
         if(!contact_id){
             const response = new ResponseBuilder()
                 .setOk(false)

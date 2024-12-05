@@ -6,7 +6,7 @@ const createMessageController = async (req, res) => {
     try{
         const user_id = req.user._id
         const {contact_id, content} = req.content
-
+        
         const new_message = await MessageRepository.createMessage(user_id, contact_id, content)
         const conversation = await MessageRepository.findMessagesBetweenUsers(user_id, contact_id)
 
@@ -38,7 +38,7 @@ const createMessageController = async (req, res) => {
             .setStatus(500)
             .setMessage('Internal Server Error')
             .setPayload({
-                detail: 'Error creating message'
+                detail: 'Error sending message'
             })
             .build()
             return res.status(500).json(response)
@@ -47,7 +47,7 @@ const createMessageController = async (req, res) => {
         const response = new ResponseBuilder()
         .setOk(true)
         .setStatus(200)
-        .setMessage('Message Created')
+        .setMessage('Message Sended')
         .setPayload({
             message: new_message,
             conversation: conversation
