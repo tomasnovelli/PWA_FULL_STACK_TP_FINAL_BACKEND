@@ -1,4 +1,6 @@
 const validateUserName = (userName) => userName && /[A-Za-z]/.test(userName) && userName.length > 3 && userName.length < 20
 const validateEmail = (email) =>  email && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)
 const validatePassword = (password) => /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}/gm.test(password) && password.length < 15
-export {validateEmail, validatePassword, validateUserName}
+const validateMessage = (message) => message && message.length < 400
+
+export {validateEmail, validatePassword, validateUserName, validateMessage}

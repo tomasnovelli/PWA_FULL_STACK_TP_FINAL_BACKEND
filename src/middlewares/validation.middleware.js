@@ -1,7 +1,7 @@
 import User from "../models/user.model.js"
 import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
-import { validateEmail, validatePassword, validateUserName } from "../utils/validation.js"
+import { validateEmail, validateMessage, validatePassword, validateUserName } from "../utils/validation.js"
 import bcrypt from 'bcrypt'
 
 export const validateRegisterFormMiddleware = async (req, res, next) => {
@@ -351,6 +351,50 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
         }
     }
     catch (error) {
+        console.error(error.message)
+        const response = new ResponseBuilder()
+            .setOk(false)
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setPayload({
+                detail: error.message
+            })
+            .build()
+        return res.status(500).json(response)
+    }
+}
+
+export const validateMessageMiddleware = async (req, res, next) => {
+    try{
+        const {contact_id} = req.params
+        const { content } = req.body
+
+        if(!contact_id){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Missing Reciever Id')
+                .setPayload({
+                    detail: 'There is no reciever id on this request'
+                })
+                .build()
+                return res.status(400).json(response)
+        }
+        if(!validateMessage(content)){
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Missing Message')
+                .setPayload({
+                    detail: 'There is no message on this request'
+                })
+                .build()
+                return res.status(400).json(response)
+        }
+        req.content = {contact_id, content}
+        return next()
+    }
+    catch(error){
         console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
