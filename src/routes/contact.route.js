@@ -7,6 +7,6 @@ const contactRouter = express.Router()
 contactRouter.use(verifyTokenMiddleware([]))
 
 contactRouter.get('/chat/:contact_id', getContactChatController)
-contactRouter.delete('/delete-contact/:contact_id', deleteContactController)
+contactRouter.delete('/delete-contact/:user_id/:contact_id', deleteContactController)
 
 export default contactRouter

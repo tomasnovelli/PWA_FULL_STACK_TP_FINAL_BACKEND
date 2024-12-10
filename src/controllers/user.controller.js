@@ -1,4 +1,5 @@
 import User from "../models/user.model.js"
+import MessageRepository from "../repositories/message.respository.js"
 import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 
@@ -63,15 +64,23 @@ const getUsercontactListController = async (req, res) => {
         const contacts = user.contacts
         const userIds = contacts.map(contact => contact.userId)
         const users = await userRepository.getUsersAddedToContactListById(userIds)
-
-        const contactList = contacts.map(contact => {
+        const contactLastMessages = contacts.map(async contact => {
+            const lastMessage = await MessageRepository.getLastMessage(user_id, contact.userId.toString())
+            return lastMessage
+        })
+        const lastMessagesList = await Promise.all(contactLastMessages)
+        
+        const contactList = contacts.map((contact) => {
             const user = users.find(user => user._id.toString() === contact.userId.toString())
+            const lastMessage = lastMessagesList.find(lastMessage => lastMessage?.receiver.toString() === contact.userId.toString() || lastMessage?.author.toString() === contact.userId.toString())
+
             return {
                 contactId: contact.userId.toString(),
                 nickName: contact.nickName,
                 userName: user?.userName,
                 email: user?.email,
-                profilePicture: user?.profilePicture
+                profilePicture: user?.profilePicture,
+                lastMessage: lastMessage?.content
             }
         })
         

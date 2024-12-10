@@ -33,6 +33,29 @@ class MessageRepository {
         )
         return result
     }
+    static async deleteConversationRecord(user_id, receiver_id){
+        const result = await Message.deleteMany(
+            {
+                $or: [
+                    { author: user_id, receiver: receiver_id },
+                    { author: receiver_id, receiver: user_id }
+                ]
+            }
+        )
+        return result
+    }
+    static async getLastMessage(user_id, contact_id) {
+        const lastMessage = await Message.findOne({
+            $or: [
+                { author: user_id, receiver: contact_id },
+                { author: contact_id, receiver: user_id }
+            ],
+            deletedBy: { $ne: user_id }
+        })
+        .sort({ created_at: -1 })
+        .limit(1)
+        return lastMessage
+    }
 }
 
 
