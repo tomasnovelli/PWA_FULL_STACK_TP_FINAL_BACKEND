@@ -16,9 +16,22 @@ class MessageRepository {
             $or: [
                 { author: user_id, receiver: receiver_id },
                 { author: receiver_id, receiver: user_id }
-            ]
+            ],
+            deletedBy: { $ne: user_id }
         })
         return messages
+    }
+    static async deleteConversationForUser(user_id, receiver_id){
+        const result = await Message.updateMany(
+            {
+                $or: [
+                    { author: user_id, receiver: receiver_id },
+                    { author: receiver_id, receiver: user_id }
+                ]
+            },
+            {$addToSet: {deletedBy: user_id}}
+        )
+        return result
     }
 }
 

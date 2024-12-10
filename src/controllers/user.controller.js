@@ -238,7 +238,7 @@ const deleteUserAccountController = async (req, res) => {
                 .build()
             return res.status(404).json(response)
         }
-        const user = await userRepository.getUserById(user_id)
+        const deleteContactList = await userRepository.updateUserProfile(user_id, {contacts: []})
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)

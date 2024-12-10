@@ -19,6 +19,10 @@ const messageSchema = new mongoose.Schema(
         created_at: {
             type: Date,
             default: Date.now()
+        },
+        deletedBy: {
+            type: [mongoose.Schema.Types.ObjectId],
+            default: []
         }
     }
 )

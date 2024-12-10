@@ -108,5 +108,45 @@ const getConversationController = async (req, res) => {
         res.status(500).json(response)
     }
 }
+const deleteConversationController = async (req, res) => {
 
-export {createMessageController, getConversationController}
+    const {user_id, contact_id} = req.params
+
+    const conversationDeleted = await MessageRepository.deleteConversationForUser(user_id, contact_id)
+    if(!conversationDeleted){
+        const response = new ResponseBuilder()
+        .setOk(false)
+        .setStatus(404)
+        .setMessage('Not Found')
+        .setPayload({
+            detail: 'Conversation not found'
+        })
+        .build()
+        return res.status(404).json(response)
+    }
+    
+    const conversation = await MessageRepository.findMessagesBetweenUsers(user_id, contact_id)
+    if(!conversation){
+        const response = new ResponseBuilder()
+        .setOk(false)
+        .setStatus(404)
+        .setMessage('Not Found')
+        .setPayload({
+            detail: 'Conversation not found'
+        })
+        .build()
+        return res.status(404).json(response)
+    }
+
+    const response = new ResponseBuilder()
+    .setOk(true)
+    .setStatus(200)
+    .setMessage('Conversation Deleted')
+    .setPayload({
+        detail: conversation
+    })
+    .build()
+    return res.status(200).json(response)
+}
+
+export {createMessageController, getConversationController, deleteConversationController}
