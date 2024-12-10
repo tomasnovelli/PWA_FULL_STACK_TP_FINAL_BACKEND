@@ -1,10 +1,9 @@
-import User from "../models/user.model.js"
 import MessageRepository from "../repositories/message.respository.js"
 import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 
 const getCurrentUserProfileDataController = async (req, res) => {
-    try{
+    try {
         const { user_id } = req.params
         const user = await userRepository.getUserById(user_id)
         if (!user) {
@@ -23,7 +22,7 @@ const getCurrentUserProfileDataController = async (req, res) => {
             .setStatus(200)
             .setMessage('User obtained')
             .setPayload({
-                user:{
+                user: {
                     id: user._id,
                     userName: user.userName,
                     email: user.email,
@@ -64,12 +63,12 @@ const getUsercontactListController = async (req, res) => {
         const contacts = user.contacts
         const userIds = contacts.map(contact => contact.userId)
         const users = await userRepository.getUsersAddedToContactListById(userIds)
-        const contactLastMessages = contacts.map(async contact => {
+        const contactLastMessages = contacts.map(async (contact) => {
             const lastMessage = await MessageRepository.getLastMessage(user_id, contact.userId.toString())
             return lastMessage
         })
         const lastMessagesList = await Promise.all(contactLastMessages)
-        
+        console.log(lastMessagesList)
         const contactList = contacts.map((contact) => {
             const user = users.find(user => user._id.toString() === contact.userId.toString())
             const lastMessage = lastMessagesList.find(lastMessage => lastMessage?.receiver.toString() === contact.userId.toString() || lastMessage?.author.toString() === contact.userId.toString())
@@ -80,10 +79,10 @@ const getUsercontactListController = async (req, res) => {
                 userName: user?.userName,
                 email: user?.email,
                 profilePicture: user?.profilePicture,
-                lastMessage: lastMessage?.content
+                lastMessage: lastMessage?.content || 'No message yet',
+                lastMessageDate: lastMessage?.created_at
             }
         })
-        
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -106,13 +105,11 @@ const getUsercontactListController = async (req, res) => {
             .build()
         return res.status(500).json(response)
     }
-
 }
 const addNewContactController = async (req, res) => {
     try {
         const { user_id } = req.params
         const { nickName, email } = req.contact
-
         const contactToSave = await userRepository.getUserByEmail(email)
         if (!contactToSave || !contactToSave.active || !contactToSave.emailVerified) {
             const response = new ResponseBuilder()
@@ -247,7 +244,7 @@ const deleteUserAccountController = async (req, res) => {
                 .build()
             return res.status(404).json(response)
         }
-        const deleteContactList = await userRepository.updateUserProfile(user_id, {contacts: []})
+        const deleteContactList = await userRepository.updateUserProfile(user_id, { contacts: [] })
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)

@@ -11,5 +11,4 @@ authRouter.post('/forgot-password', validateForgotPasswordFormMiddleware, forgot
 authRouter.put('/reset-password/:reset_token', validateResetPasswordFormMiddleware, resetPasswordController)
 
 
-
 export default authRouter

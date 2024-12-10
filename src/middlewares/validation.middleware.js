@@ -1,4 +1,3 @@
-import User from "../models/user.model.js"
 import userRepository from "../repositories/user.repository.js"
 import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 import { validateEmail, validateMessage, validatePassword, validateUserName } from "../utils/validation.js"
@@ -53,18 +52,6 @@ export const validateRegisterFormMiddleware = async (req, res, next) => {
             return res.status(400).json(response)
         }
         req.user = { userName, email, password, profilePicture }
-/*         const existUser = await User.findOne({ email: email })
-        if (existUser) {
-            const response = new ResponseBuilder()
-                .setOk(false)
-                .setStatus(400)
-                .setMessage('Bad Request')
-                .setPayload({
-                    detail: 'User already exist'
-                })
-                .build()
-            return res.json(response)
-        } */
         return next()
     }
     catch (error) {
@@ -363,7 +350,6 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-
 export const validateMessageMiddleware = async (req, res, next) => {
     try{
         const {contact_id} = req.params

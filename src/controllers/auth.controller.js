@@ -6,11 +6,9 @@ import ResponseBuilder from '../utils/responseBuilder/responseBuilder.js'
 import { sendEmail } from '../utils/mail.util.js'
 
 const registrationController = async (req, res) => {
-
     try {
         const { userName, email, password, profilePicture } = req.user
         const existingUser = await userRepository.getUserByEmail(email)
-
         if (existingUser && existingUser.active) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -22,7 +20,6 @@ const registrationController = async (req, res) => {
                 .build()
             return res.status(400).json(response)
         }
-
         const hashedPassword = await bcrypt.hash(password, 10)
         const verificationToken = jwt.sign(
             { email: email },
@@ -48,7 +45,6 @@ const registrationController = async (req, res) => {
             active: true,
             verificationToken
         }
-
         if (existingUser && !existingUser.active) {
             const updatedUser = await userRepository.updateUserProfile(existingUser._id, newUserToRegister)
             const response = new ResponseBuilder()
@@ -65,7 +61,6 @@ const registrationController = async (req, res) => {
                 )
                 .build()
             return res.status(200).json(response)
-
         }
         await userRepository.saveUser(newUserToRegister)
         const response = new ResponseBuilder()
@@ -231,48 +226,59 @@ const forgotPasswordController = async (req, res) => {
     }
 }
 const resetPasswordController = async (req, res) => {
-
-    const { password } = req.body
-    const { reset_token } = req.params
-
-    const decoded = jwt.verify(reset_token, ENVIROMENT.JWT_SECRET)
-    if (!decoded) {
+    try {
+        const { password } = req.body
+        const { reset_token } = req.params
+        const decoded = jwt.verify(reset_token, ENVIROMENT.JWT_SECRET)
+        if (!decoded) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(400)
+                .setMessage('Reset token not valid')
+                .setPayload({
+                    detail: 'Reset token not valid'
+                })
+                .build()
+            return res.status(400).json(response)
+        }
+        const { email } = decoded
+        const user = await userRepository.getUserByEmail(email)
+        if (!user) {
+            const response = new ResponseBuilder()
+                .setOk(false)
+                .setStatus(404)
+                .setMessage('User Not Found')
+                .setPayload({
+                    detail: 'The user isnt registred'
+                })
+                .build()
+            return res.json(response)
+        }
+        const hashedPassword = await bcrypt.hash(password, 10)
+        user.password = hashedPassword
+        await userRepository.saveUser(user)
         const response = new ResponseBuilder()
-            .setOk(false)
-            .setStatus(400)
-            .setMessage('Reset token not valid')
+            .setOk(true)
+            .setStatus(200)
+            .setMessage('Password reset succesfully')
             .setPayload({
-                detail: 'Reset token not valid'
+                detail: 'The password has been reset succesfully'
             })
             .build()
-        return res.status(400).json(response)
+        return res.status(200).json(response)
     }
-    const { email } = decoded
-    const user = await userRepository.getUserByEmail(email)
-    if (!user) {
+    catch (error) {
+        console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
-            .setStatus(404)
-            .setMessage('User Not Found')
+            .setStatus(500)
+            .setMessage('Internal Server Error')
             .setPayload({
-                detail: 'The user isnt registred'
+                detail: error.message
             })
             .build()
-        return res.json(response)
+        return res.status(500).json(response)
     }
-    const hashedPassword = await bcrypt.hash(password, 10)
-    user.password = hashedPassword
-    await userRepository.saveUser(user)
-    const response = new ResponseBuilder()
-        .setOk(true)
-        .setStatus(200)
-        .setMessage('Password reset succesfully')
-        .setPayload({
-            detail: 'The password has been reset succesfully'
-        })
-        .build()
-    return res.status(200).json(response)
-
 }
 
 export {
