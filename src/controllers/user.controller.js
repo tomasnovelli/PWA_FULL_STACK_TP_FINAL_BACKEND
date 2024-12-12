@@ -109,7 +109,7 @@ const addNewContactController = async (req, res) => {
     try {
         const { user_id } = req.params
         const { nickName, email } = req.contact
-        const contactToSave = await userRepository.getUserByEmail(email)
+        const contactToSave = await userRepository.getUserByEmail(email.toLowerCase())
         if (!contactToSave || !contactToSave.active || !contactToSave.emailVerified) {
             const response = new ResponseBuilder()
                 .setOk(false)

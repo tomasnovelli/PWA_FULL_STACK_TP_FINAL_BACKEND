@@ -81,7 +81,7 @@ export const validateLoginFormMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        const user = await userRepository.getUserByEmail(email)
+        const user = await userRepository.getUserByEmail(email.toLowerCase())
         if (!user || !user.active) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -146,7 +146,7 @@ export const validateForgotPasswordFormMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        const user = await userRepository.getUserByEmail(email)
+        const user = await userRepository.getUserByEmail(email.toLowerCase())
         if (!user || !user.active) {
             const response = new ResponseBuilder()
                 .setOk(false)

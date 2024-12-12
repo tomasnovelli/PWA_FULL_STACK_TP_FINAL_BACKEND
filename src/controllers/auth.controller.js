@@ -8,7 +8,7 @@ import { sendEmail } from '../utils/mail.util.js'
 const registrationController = async (req, res) => {
     try {
         const { userName, email, password, profilePicture } = req.user
-        const existingUser = await userRepository.getUserByEmail(email)
+        const existingUser = await userRepository.getUserByEmail(email.toLowerCase())
         if (existingUser && existingUser.active) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -22,7 +22,7 @@ const registrationController = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10)
         const verificationToken = jwt.sign(
-            { email: email },
+            { email: email.toLowerCase() },
             ENVIROMENT.JWT_SECRET,
             { expiresIn: '1d' }
         )
@@ -40,7 +40,7 @@ const registrationController = async (req, res) => {
         {
             userName,
             password: hashedPassword,
-            email,
+            email: email.toLowerCase(),
             profilePicture,
             active: true,
             verificationToken
@@ -156,7 +156,7 @@ const verifyMailValidationTokenController = async (req, res) => {
 const loginController = async (req, res) => {
     try {
         const { userName, email, _id, profilePicture } = req.user
-        const token = jwt.sign({ email, _id }, ENVIROMENT.JWT_SECRET, { expiresIn: '5h' })
+        const token = jwt.sign({ email: email.toLowerCase(), _id }, ENVIROMENT.JWT_SECRET, { expiresIn: '5h' })
         const response = new ResponseBuilder()
             .setOk(true)
             .setStatus(200)
@@ -166,7 +166,7 @@ const loginController = async (req, res) => {
                 user: {
                     id: _id,
                     userName,
-                    email,
+                    email: email.toLowerCase(),
                     profilePicture
                 }
             })
@@ -189,7 +189,7 @@ const loginController = async (req, res) => {
 const forgotPasswordController = async (req, res) => {
     try {
         const { email, userName } = req.user
-        const reset_token = jwt.sign({ email }, ENVIROMENT.JWT_SECRET, { expiresIn: '1h' })
+        const reset_token = jwt.sign({ email: email.toLowerCase() }, ENVIROMENT.JWT_SECRET, { expiresIn: '1h' })
         const resetUrl = `${ENVIROMENT.URL_FRONT}/reset-password/${reset_token}`
         await sendEmail({
             to: email,
@@ -242,7 +242,7 @@ const resetPasswordController = async (req, res) => {
             return res.status(400).json(response)
         }
         const { email } = decoded
-        const user = await userRepository.getUserByEmail(email)
+        const user = await userRepository.getUserByEmail(email.toLowerCase())
         if (!user) {
             const response = new ResponseBuilder()
                 .setOk(false)
