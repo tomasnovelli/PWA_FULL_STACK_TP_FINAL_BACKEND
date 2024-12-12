@@ -68,7 +68,6 @@ const getUsercontactListController = async (req, res) => {
             return lastMessage
         })
         const lastMessagesList = await Promise.all(contactLastMessages)
-        console.log(lastMessagesList)
         const contactList = contacts.map((contact) => {
             const user = users.find(user => user._id.toString() === contact.userId.toString())
             const lastMessage = lastMessagesList.find(lastMessage => lastMessage?.receiver.toString() === contact.userId.toString() || lastMessage?.author.toString() === contact.userId.toString())

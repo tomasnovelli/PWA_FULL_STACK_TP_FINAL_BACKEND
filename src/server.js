@@ -1,13 +1,13 @@
 import express from "express";
-import ENVIROMENT from "./src/config/enviroment.config.js";
-import configDB from './src/dbConfig/mongoDB.config.js';
-import statusRouter from "./src/routes/status.route.js";
-import authRouter from "./src/routes/auth.route.js";
+import ENVIROMENT from "./config/enviroment.config.js";
+import configDB from './dbConfig/mongoDB.config.js';
+import statusRouter from "./routes/status.route.js";
+import authRouter from "./routes/auth.route.js";
 import cors from 'cors'
-import { verifiApiKeyMiddleware } from "./src/middlewares/auth.middleware.js";
-import userRouter from "./src/routes/user.route.js";
-import contactRouter from "./src/routes/contact.route.js";
-import messagesRouter from "./src/routes/message.route.js";
+import { verifiApiKeyMiddleware } from "./middlewares/auth.middleware.js";
+import userRouter from "./routes/user.route.js";
+import contactRouter from "./routes/contact.route.js";
+import messagesRouter from "./routes/message.route.js";
 
 
 const app = express()
