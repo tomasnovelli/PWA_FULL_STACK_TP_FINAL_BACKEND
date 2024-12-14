@@ -259,7 +259,7 @@ const validateAddNewContactFormMiddleware = async (req, res, next) => {
 const validateUpdateUserProfileMiddleware = async (req, res, next) => {
     try {
         const { user_id } = req.params
-        const { userName, actualPassword, password, profilePicture } = req.body
+        const { userName, currentPassword, password, profilePicture } = req.body
         if (!user_id) {
             const response = new ResponseBuilder()
                 .setOk(false)
@@ -293,11 +293,11 @@ const validateUpdateUserProfileMiddleware = async (req, res, next) => {
                 .build()
             return res.status(400).json(response)
         }
-        if (actualPassword.trim() === '' && password.trim() === '') {
+        if (currentPassword.trim() === '' && password.trim() === '') {
             req.user = { userName, profilePicture, user_id }
             return next()
         }
-        else if (!validatePassword(actualPassword)) {
+        else if (!validatePassword(currentPassword)) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -320,14 +320,14 @@ const validateUpdateUserProfileMiddleware = async (req, res, next) => {
             return res.status(400).json(response)
         } else {
             const user = await userRepository.getUserById(user_id)
-            const isValidPassword = await bcrypt.compare(actualPassword, user.password)
+            const isValidPassword = await bcrypt.compare(currentPassword, user.password)
             if (!isValidPassword) {
                 const response = new ResponseBuilder()
                     .setOk(false)
                     .setStatus(400)
                     .setMessage('Bad Request')
                     .setPayload({
-                        detail: 'Password doesnt match with your actual password, try again'
+                        detail: 'Current password wrong, try again'
                     })
                     .build()
                 return res.status(400).json(response)
