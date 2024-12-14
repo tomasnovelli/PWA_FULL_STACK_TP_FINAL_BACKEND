@@ -61,6 +61,7 @@ const getUsercontactListController = async (req, res) => {
             return res.status(404).json(response)
         }
         const contacts = user.contacts
+
         const userIds = contacts.map(contact => contact.userId)
         const users = await userRepository.getUsersAddedToContactListById(userIds)
         const contactLastMessages = contacts.map(async (contact) => {

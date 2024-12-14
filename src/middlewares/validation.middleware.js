@@ -3,7 +3,7 @@ import ResponseBuilder from "../utils/responseBuilder/responseBuilder.js"
 import { validateEmail, validateMessage, validatePassword, validateUserName } from "../utils/validation.js"
 import bcrypt from 'bcrypt'
 
-export const validateRegisterFormMiddleware = async (req, res, next) => {
+const validateRegisterFormMiddleware = async (req, res, next) => {
     try {
         const { userName, email, password, profilePicture } = req.body
 
@@ -67,7 +67,7 @@ export const validateRegisterFormMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateLoginFormMiddleware = async (req, res, next) => {
+const validateLoginFormMiddleware = async (req, res, next) => {
     try {
         const { email, password } = req.body
         if (!validateEmail(email)) {
@@ -132,7 +132,7 @@ export const validateLoginFormMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateForgotPasswordFormMiddleware = async (req, res, next) => {
+const validateForgotPasswordFormMiddleware = async (req, res, next) => {
     try {
         const { email } = req.body
         if (!validateEmail(email)) {
@@ -174,7 +174,7 @@ export const validateForgotPasswordFormMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateResetPasswordFormMiddleware = async (req, res, next) => {
+const validateResetPasswordFormMiddleware = async (req, res, next) => {
     try {
         const { password } = req.body
         const { reset_token } = req.params
@@ -215,7 +215,7 @@ export const validateResetPasswordFormMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateAddNewContactFormMiddleware = async (req, res, next) => {
+const validateAddNewContactFormMiddleware = async (req, res, next) => {
     try {
         const { nickName, email } = req.body
         if (!validateUserName(nickName)) {
@@ -256,7 +256,7 @@ export const validateAddNewContactFormMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
+const validateUpdateUserProfileMiddleware = async (req, res, next) => {
     try {
         const { user_id } = req.params
         const { userName, actualPassword, password, profilePicture } = req.body
@@ -350,12 +350,12 @@ export const validateUpdateUserProfileMiddleware = async (req, res, next) => {
         return res.status(500).json(response)
     }
 }
-export const validateMessageMiddleware = async (req, res, next) => {
-    try{
-        const {contact_id} = req.params
+const validateMessageMiddleware = async (req, res, next) => {
+    try {
+        const { contact_id } = req.params
         const { content } = req.body
-        
-        if(!contact_id){
+
+        if (!contact_id) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -364,9 +364,9 @@ export const validateMessageMiddleware = async (req, res, next) => {
                     detail: 'There is no reciever id on this request'
                 })
                 .build()
-                return res.status(400).json(response)
+            return res.status(400).json(response)
         }
-        if(!validateMessage(content)){
+        if (!validateMessage(content)) {
             const response = new ResponseBuilder()
                 .setOk(false)
                 .setStatus(400)
@@ -375,12 +375,12 @@ export const validateMessageMiddleware = async (req, res, next) => {
                     detail: 'There is no message on this request'
                 })
                 .build()
-                return res.status(400).json(response)
+            return res.status(400).json(response)
         }
-        req.content = {contact_id, content}
+        req.content = { contact_id, content }
         return next()
     }
-    catch(error){
+    catch (error) {
         console.error(error.message)
         const response = new ResponseBuilder()
             .setOk(false)
@@ -394,4 +394,12 @@ export const validateMessageMiddleware = async (req, res, next) => {
     }
 }
 
-
+export {
+    validateRegisterFormMiddleware,
+    validateLoginFormMiddleware,
+    validateForgotPasswordFormMiddleware,
+    validateResetPasswordFormMiddleware,
+    validateAddNewContactFormMiddleware,
+    validateUpdateUserProfileMiddleware,
+    validateMessageMiddleware,
+}
